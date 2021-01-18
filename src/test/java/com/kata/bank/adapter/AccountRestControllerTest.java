@@ -6,6 +6,7 @@ import com.google.gson.JsonDeserializer;
 import com.kata.bank.BankApplication;
 import com.kata.bank.domain.service.AccountService;
 import com.kata.bank.dto.DepositDto;
+import com.kata.bank.dto.WithdrawDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,5 +66,26 @@ public class AccountRestControllerTest {
         //verify
         Mockito.verify(accountService).addAccountOperation(accountNumber, amount);
     }
+
+    @Test
+    public void should_succeed_to_make_a_withdraw() throws Exception {
+
+        //prepare
+        String accountNumber = "1234";
+        BigDecimal amount = BigDecimal.valueOf(30);
+        Mockito.doNothing().when(accountService).addAccountOperation(accountNumber, amount);
+
+        //execute
+        mockMvc.perform(MockMvcRequestBuilders.put("/account/1234/withdraw")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(OBJECT_MAPPER.toJson(
+                        new WithdrawDto().setAmount(BigDecimal.valueOf(30))
+                )))
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.ACCEPTED.value()));
+
+        //verify
+        Mockito.verify(accountService).addAccountOperation(accountNumber, amount.negate());
+    }
+
 
 }
