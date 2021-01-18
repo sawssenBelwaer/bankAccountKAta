@@ -46,4 +46,20 @@ class AccountService implements IAccountService {
         //call operation service
         operationService.addAccountOperation(accountNumber, operationAmount);
     }
+
+    @Override
+    @Transactional
+    public Account getAccountByNumber(String accountNumber) {
+
+        AccountEntity entity = accountRepository.findById(accountNumber)
+                .orElseThrow(() -> new ObjectNotFoundException(accountNumber, AccountEntity.class.getSimpleName()));
+
+        return Account.builder()
+                .balance(entity.getBalance())
+                .creationDate(entity.getCreationDate())
+                .number(entity.getNumber())
+                .overdraft(entity.getOverdraft())
+                .build();
+
+    }
 }

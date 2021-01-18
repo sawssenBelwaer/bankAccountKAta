@@ -8,6 +8,7 @@ import com.kata.bank.infrastructure.entity.OperationEntity;
 import com.kata.bank.infrastructure.repository.AccountRepository;
 import com.kata.bank.infrastructure.repository.OperationRepository;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,5 +78,29 @@ public class AccountServiceTest {
 
     }
 
+    @Test
+    public void should_return_account_when_given_account_number() {
 
+        //prepare
+        String accountNumber = "1234";
+        AccountEntity entity = new AccountEntity();
+        entity.setBalance(BigDecimal.valueOf(230));
+        entity.setCreationDate(LocalDateTime.now());
+        entity.setNumber(accountNumber);
+        entity.setOverdraft(BigDecimal.valueOf(34));
+
+        when(accountRepository.findById(accountNumber)).thenReturn(Optional.ofNullable(entity));
+
+        //execute
+        Account result = accountService.getAccountByNumber(accountNumber);
+
+        //assert
+        Assertions.assertEquals(Account.builder()
+                        .balance(entity.getBalance())
+                        .creationDate(entity.getCreationDate())
+                        .number(entity.getNumber())
+                        .overdraft(entity.getOverdraft())
+                        .build(),
+                result, "Accounts must be equal");
+    }
 }
